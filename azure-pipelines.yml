@@ -29,9 +29,19 @@ steps:
     ng build --prod
   displayName: 'npm build'
 
-- task: PublishBuildArtifacts@1
-  displayName: 'publish artifact'
+ # copy output to build artifacts
+
+- task: CopyFiles@2
+  displayName: "Copy Files to: $(Build.ArtifactStagingDirectory)/app"
   inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-    ArtifactName: 'drop'
-    publishLocation: 'Container'
+    SourceFolder: 'wwwroot' # edit this to your needs
+    TargetFolder: '$(Build.ArtifactStagingDirectory)/app'
+
+# publish build artifacts
+
+- task: PublishBuildArtifacts@1
+  displayName: "Publish artifacts"
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)/app'
+    ArtifactName: app
+    publishLocation: Container
