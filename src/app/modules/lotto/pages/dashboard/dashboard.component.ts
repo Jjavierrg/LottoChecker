@@ -71,11 +71,7 @@ export class DashboardComponent implements OnInit {
     this.lottoService.saveUserNumbers(this.numbers);
   }
 
-  private loadNumbers() {
-    this.numbers = this.lottoService.getUserNumbers();
-  }
-
-  private checkNumbers(): void {
+  public checkNumbers(): void {
     if (this.isBusy) {
       return;
     }
@@ -105,5 +101,9 @@ export class DashboardComponent implements OnInit {
       () => this.checkNumbers(),
       this.reloadSeconds * 1000
     );
+  }
+
+  private loadNumbers() {
+    this.numbers = this.lottoService.getUserNumbers();
   }
 }
