@@ -1,0 +1,25 @@
+<div class="modal fade show">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h4 class="modal-title">{{header}}</h4>
+        <button type="button" class="close" (click)="closeDialog()">&times;</button>
+      </div>
+
+      <!-- Modal body -->
+      <div class="modal-body">
+        <ng-content></ng-content>
+      </div>
+
+      <!-- Modal footer -->
+      <div class="modal-footer">
+        <button type="button" class="{{cancelButton.style}}" (click)="closeDialog()"
+          [disabled]="!cancelButton.enabled">{{cancelButton.text}}</button>
+        <button type="button" class="{{okButton.style}}" (click)="actionInvoked()"
+          [disabled]="!okButton.enabled">{{okButton.text}}</button>
+      </div>
+    </div>
+  </div>
+</div>

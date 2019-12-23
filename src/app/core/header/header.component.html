@@ -1,0 +1,6 @@
+<nav class="navbar navbar-expand-md navbar-dark bg-dark">
+  <a class="navbar-brand" href="#">Comprobador Lotería</a>
+  <select #s class="custom-select w-25 ml-auto mr-1" (change)="onEndpointSelect(s.value)" [value]="currentEndpoint.id">
+    <option [value]="endpoint.id" *ngFor="let endpoint of endpoints">{{endpoint.description}}</option>
+  </select>
+</nav>

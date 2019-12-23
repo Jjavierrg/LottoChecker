@@ -1,0 +1,7 @@
+export enum DrawStatus {
+  NO_START = 0,
+  STARTED = 1,
+  ENDED_NOT_VERIFIED = 2,
+  ENDED_NOT_OFFICIAL = 3,
+  ENDED_OFFICIAL = 4
+}

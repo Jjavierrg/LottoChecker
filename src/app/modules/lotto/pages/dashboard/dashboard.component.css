@@ -1,0 +1,30 @@
+.toolbar > button:not(:last-child) {
+  margin-right: 5px;
+}
+
+.toolbar {
+  margin-bottom: 1rem;
+  display: flex;
+}
+
+.refresh {
+  font-size: 1.5rem;
+  text-decoration: none;
+}
+
+.refresh.busy {
+  animation: rotate-center 2s linear infinite ;
+}
+
+.refresh:before {
+  content: "\21BB";
+}
+
+@keyframes rotate-center {
+  0% {
+    transform: rotate(0);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

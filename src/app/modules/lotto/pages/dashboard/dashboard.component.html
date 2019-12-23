@@ -1,0 +1,63 @@
+<div class="toolbar">
+  <button type="button" class="btn btn-primary" (click)="openNewDialog()">Add</button>
+  <button type="button" class="btn btn-warning" [disabled]="editNumber === null"
+    (click)="showEditModal=true">Edit</button>
+    <button type="button" class="btn btn-danger" [disabled]="selectedNumber === null"
+      (click)="showDeleteModal=true">Delete</button>
+  <span class="flex-grow-1"></span>
+  <a class="refresh mr-3" [class.busy]="isBusy" (click)="checkNumbers()" href="#"></a>
+</div>
+<div class="flex-container-fill">
+  <app-lotto-table [data]="numbers" (selectionChange)="selectedNumber = $event"></app-lotto-table>
+</div>
+
+<!-- DELETE MODAL -->
+<app-modal *ngIf="showDeleteModal" header="Confirmar eliminación" (dialogClosed)="showDeleteModal=false"
+  [okButton]="{ text: 'Eliminar', style: 'btn btn-danger', enabled: true }"
+  (actionClicked)="deleteNumber(selectedNumber)">
+  ¿Está seguro de quere eliminar el número seleccionado?
+</app-modal>
+
+<!-- ADD MODAL -->
+<app-modal *ngIf="showAddModal" header="Añadir Número" (actionClicked)="addNewNumber(newItem)"
+  (dialogClosed)="showAddModal=false"
+  [okButton]="{ text: 'Añadir', style: 'btn btn-success', enabled: addForm.form.valid }">
+  <form #addForm="ngForm">
+    <div class="form-group">
+      <label for="ticket-number" class="col-form-label">Número</label>
+      <input type="number" maxlength="5" min="0" max="99999" class="form-control" [(ngModel)]="newItem.number"
+        name="number" required>
+    </div>
+    <div class="form-group">
+      <label for="ticket-amount" class="col-form-label">Importe</label>
+      <input type="number" class="form-control" id="ticket-amount" [(ngModel)]="newItem.amount" name="amount" required>
+    </div>
+    <div class="form-group">
+      <label for="ticket-description" class="col-form-label">Descripción</label>
+      <textarea class="form-control" id="ticket-description" [(ngModel)]="newItem.description"
+        name="description"></textarea>
+    </div>
+  </form>
+</app-modal>
+
+<!-- EDIT MODAL -->
+<app-modal *ngIf="showEditModal" header="Editar Número" (actionClicked)="updateNumber(editNumber)"
+  (dialogClosed)="showEditModal = false"
+  [okButton]="{ text: 'Editar', style: 'btn btn-success', enabled: editForm.form.valid }">
+  <form #editForm="ngForm">
+    <div class="form-group">
+      <label for="ticket-number" class="col-form-label">Número</label>
+      <input type="number" maxlength="5" min="0" max="99999" class="form-control" [(ngModel)]="editNumber.number"
+        name="number" required>
+    </div>
+    <div class="form-group">
+      <label for="ticket-amount" class="col-form-label">Importe</label>
+      <input type="number" class="form-control" id="ticket-amount" [(ngModel)]="editNumber.amount" name="amount" required>
+    </div>
+    <div class="form-group">
+      <label for="ticket-description" class="col-form-label">Descripción</label>
+      <textarea class="form-control" id="ticket-description" [(ngModel)]="editNumber.description"
+        name="description"></textarea>
+    </div>
+  </form>
+</app-modal>
