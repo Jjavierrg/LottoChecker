@@ -30,12 +30,12 @@ steps:
   displayName: 'npm build'
 
  # copy output to build artifacts
-
 - task: CopyFiles@2
   displayName: "Copy Files to: $(Build.ArtifactStagingDirectory)/app"
   inputs:
-    SourceFolder: 'wwwroot' # edit this to your needs
+    SourceFolder: 'dist/loteria'
     TargetFolder: '$(Build.ArtifactStagingDirectory)/app'
+    CleanTargetFolder: true
 
 # publish build artifacts
 
