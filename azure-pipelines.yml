@@ -30,8 +30,8 @@ steps:
   displayName: 'npm build'
 
 - task: PublishBuildArtifacts@1
+  displayName: 'publish artifact'
   inputs:
-    PathtoPublish: 'dist/ng-azure-devops'
-    ArtifactName: 'web-app'
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'drop'
     publishLocation: 'Container'
-  displayName: 'Publish Artifacts'
