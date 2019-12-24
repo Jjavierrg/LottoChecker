@@ -61,6 +61,7 @@ export class DashboardComponent implements OnInit {
   public deleteNumber(lottoNumber: LottoNumber) {
     this.numbers = this.numbers.filter(x => x !== lottoNumber);
     this.showDeleteModal = false;
+    this.selectedNumber = null;
     this.lottoService.saveUserNumbers(this.numbers);
   }
 
