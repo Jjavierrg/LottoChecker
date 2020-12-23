@@ -1,14 +1,18 @@
-import { Injectable } from '@angular/core';
-import { Observable, of, Subject } from 'rxjs';
-import { HttpHeaders, HttpClient } from '@angular/common/http';
-import { map } from 'rxjs/operators';
-import { ApiResult } from 'src/app/shared/models/api-result';
-import { ServiceEndpoint } from 'src/app/shared/models/service-endpoint';
-import { UserConfigurationService } from './user-configuration.service';
-import { LottoNumber } from 'src/app/shared/models/lotto-number';
+import { Injectable } from "@angular/core";
+import { Observable, of, pipe, Subject } from "rxjs";
+import {
+  HttpHeaders,
+  HttpClient,
+  HttpErrorResponse,
+} from "@angular/common/http";
+import { map, catchError } from "rxjs/operators";
+import { ApiResult } from "src/app/shared/models/api-result";
+import { ServiceEndpoint } from "src/app/shared/models/service-endpoint";
+import { UserConfigurationService } from "./user-configuration.service";
+import { LottoNumber } from "src/app/shared/models/lotto-number";
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root",
 })
 export class LottoService {
   private endpointHandler: Subject<ServiceEndpoint>;
@@ -16,14 +20,14 @@ export class LottoService {
   private endpoints: ServiceEndpoint[] = [
     new ServiceEndpoint({
       id: 1,
-      description: 'Sorteo de Navidad',
-      url: 'api.elpais.com/ws/LoteriaNavidadPremiados'
+      description: "Sorteo de Navidad",
+      url: "/ws/LoteriaNavidadPremiados",
     }),
     new ServiceEndpoint({
       id: 2,
-      description: 'Sorteo del Niño',
-      url: 'api.elpais.com/ws/LoteriaNinoPremiados'
-    })
+      description: "Sorteo del Niño",
+      url: "/ws/LoteriaNinoPremiados",
+    }),
   ];
 
   constructor(
@@ -32,7 +36,7 @@ export class LottoService {
   ) {
     const configuration = this.userConfigService.getUserConfiguration();
     const endpointIndex = configuration.endpoint;
-    this.currentEndpoint = this.endpoints.find(x => x.id === endpointIndex);
+    this.currentEndpoint = this.endpoints.find((x) => x.id === endpointIndex);
     this.endpointHandler = new Subject<ServiceEndpoint>();
   }
 
@@ -55,25 +59,16 @@ export class LottoService {
     this.endpointHandler.next(endpoint);
   }
 
-  public checkNumber(numero: number): Observable<ApiResult> {
+  public async checkNumber(numero: number): Promise<ApiResult> {
     const url: string = this.currentEndpoint.url;
-    const headers = new HttpHeaders().set(
-      'Accept',
-      'text/html, application/xhtml+xml, */*'
-    );
+    let response: string;
 
-    return this.http
-      .get(`https://cors-anywhere.herokuapp.com/${url}?n=${numero}`, {
-        withCredentials: false,
-        responseType: 'text',
-        headers
-      })
-      .pipe(
-        map((res: string) => {
-          const parsed: string = res.replace('busqueda=', '');
-          return JSON.parse(parsed);
-        })
-      );
+    try {
+      await this.http.get(`${url}?n=${numero}`).toPromise();
+    } catch (error) {
+      response = error.error.text.replace("busqueda=", "");
+    }
+    return JSON.parse(response);
   }
 
   public saveUserNumbers(numbers: LottoNumber[]): void {

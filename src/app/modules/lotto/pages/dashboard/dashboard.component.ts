@@ -1,14 +1,14 @@
-import { Component, OnInit } from '@angular/core';
-import { LottoNumber } from 'src/app/shared/models/lotto-number';
-import { LottoService } from 'src/app/core/services/lotto.service';
-import { forkJoin, Observable } from 'rxjs';
-import { finalize, max } from 'rxjs/operators';
-import { ServiceEndpoint } from 'src/app/shared/models/service-endpoint';
+import { Component, OnInit } from "@angular/core";
+import { LottoNumber } from "src/app/shared/models/lotto-number";
+import { LottoService } from "src/app/core/services/lotto.service";
+import { forkJoin, Observable, of, from } from "rxjs";
+import { finalize, max } from "rxjs/operators";
+import { ServiceEndpoint } from "src/app/shared/models/service-endpoint";
 
 @Component({
-  selector: 'app-dashboard',
-  templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.css']
+  selector: "app-dashboard",
+  templateUrl: "./dashboard.component.html",
+  styleUrls: ["./dashboard.component.css"],
 })
 export class DashboardComponent implements OnInit {
   private reloadSeconds = 60;
@@ -34,7 +34,7 @@ export class DashboardComponent implements OnInit {
 
   constructor(private lottoService: LottoService) {
     this.endpointHandler = lottoService.getEndpointHandler();
-    this.endpointHandler.subscribe(_ => this.loadNumbers());
+    this.endpointHandler.subscribe((_) => this.loadNumbers());
   }
 
   ngOnInit(): void {
@@ -43,7 +43,7 @@ export class DashboardComponent implements OnInit {
   }
 
   public openNewDialog() {
-    this.newItem = new LottoNumber({ amount: 20, number: 0, description: '' });
+    this.newItem = new LottoNumber({ amount: 20, number: 0, description: "" });
     this.showAddModal = true;
   }
 
@@ -51,7 +51,7 @@ export class DashboardComponent implements OnInit {
     this.showAddModal = false;
     const maxItem = this.numbers.reduce((previous, current) => {
       return previous.id > current.id ? previous : current;
-    }, new LottoNumber({id: 0}));
+    }, new LottoNumber({ id: 0 }));
 
     lottoNumber.id = maxItem.id + 1;
     this.numbers.push(new LottoNumber(lottoNumber));
@@ -59,14 +59,14 @@ export class DashboardComponent implements OnInit {
   }
 
   public deleteNumber(lottoNumber: LottoNumber) {
-    this.numbers = this.numbers.filter(x => x !== lottoNumber);
+    this.numbers = this.numbers.filter((x) => x !== lottoNumber);
     this.showDeleteModal = false;
     this.selectedNumber = null;
     this.lottoService.saveUserNumbers(this.numbers);
   }
 
   public updateNumber(lottoNumber: LottoNumber) {
-    const index = this.numbers.findIndex(x => x.id === lottoNumber.id);
+    const index = this.numbers.findIndex((x) => x.id === lottoNumber.id);
     this.numbers[index] = new LottoNumber(lottoNumber);
     this.showEditModal = false;
     this.lottoService.saveUserNumbers(this.numbers);
@@ -79,18 +79,21 @@ export class DashboardComponent implements OnInit {
 
     this.isBusy = true;
 
-    const tasks = this.numbers.map(ticket => {
-      return this.lottoService.checkNumber(ticket.number);
+    const tasks = this.numbers.map((ticket) => {
+      return from(this.lottoService.checkNumber(ticket.number));
     });
 
     forkJoin(tasks)
       .pipe(finalize(() => (this.isBusy = false)))
-      .subscribe(result => {
-        result.forEach(x => {
-          this.numbers.filter(n => n.number === x.numero).forEach(ticket => {
-            ticket.price = x.premio > 0 ? (x.premio * ticket.amount) / 20 : null;
-            ticket.status = x.status;
-          });
+      .subscribe((result) => {
+        result.forEach((x) => {
+          this.numbers
+            .filter((n) => n.number === x.numero)
+            .forEach((ticket) => {
+              ticket.price =
+                x.premio > 0 ? (x.premio * ticket.amount) / 20 : null;
+              ticket.status = x.status;
+            });
         });
 
         this.lottoService.saveUserNumbers(this.numbers);
