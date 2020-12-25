@@ -1,8 +1,0 @@
-{
-  "/ws/*": {
-    "target": "https://api.elpais.com",
-    "secure": false,
-    "logLevel": "debug",
-    "changeOrigin": true
-  }
-}

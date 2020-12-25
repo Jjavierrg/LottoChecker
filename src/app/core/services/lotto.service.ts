@@ -14,12 +14,12 @@ export class LottoService {
     new ServiceEndpoint({
       id: 1,
       description: 'Sorteo de Navidad',
-      url: '/ws/LoteriaNavidadPremiados',
+      url: 'https://api.elpais.com/ws/LoteriaNavidadPremiados',
     }),
     new ServiceEndpoint({
       id: 2,
       description: 'Sorteo del Niño',
-      url: '/ws/LoteriaNinoPremiados',
+      url: 'https://api.elpais.com/ws/LoteriaNinoPremiados',
     }),
   ];
 
@@ -54,11 +54,11 @@ export class LottoService {
     let response: string;
 
     try {
-      await this.http.get(`${url}?n=${numero}`).toPromise();
+      response = await this.http.get(`${url}?n=${numero}`, { responseType: 'text' }).toPromise();
     } catch (error) {
-      response = error.error.text.replace('busqueda=', '');
+      response = error.error.text;
     }
-    return JSON.parse(response);
+    return JSON.parse(response.replace('busqueda=', ''));
   }
 
   public saveUserNumbers(numbers: LottoNumber[]): void {
