@@ -59,7 +59,6 @@ export class LottoService {
     } catch (error) {
       response = error.error.text;
     }
-
     return JSON.parse(response.replace('busqueda=', ''));
   }
 
