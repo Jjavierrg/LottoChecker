@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
 @Component({
   selector: 'app-header',
   templateUrl: './header.component.html',
-  styleUrls: ['./header.component.css']
+  styleUrls: ['./header.component.css'],
 })
 export class HeaderComponent implements OnInit {
   public endpoints: ServiceEndpoint[];
@@ -16,7 +16,7 @@ export class HeaderComponent implements OnInit {
 
   constructor(private lottoService: LottoService) {
     this.endpointHandler = lottoService.getEndpointHandler();
-    this.endpointHandler.subscribe(endpoint => {
+    this.endpointHandler.subscribe((endpoint) => {
       const currentEnpointId = this.currentEndpoint ? this.currentEndpoint.id : 0;
       const newEnpointId = endpoint ? endpoint.id : 0;
 
@@ -27,12 +27,12 @@ export class HeaderComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.lottoService.getEndpoints().subscribe(data => (this.endpoints = data));
+    this.endpoints = this.lottoService.getEndpoints();
     this.currentEndpoint = this.lottoService.getCurrentEndpoint();
   }
 
   public onEndpointSelect(value: string): void {
-    this.currentEndpoint = this.endpoints.find(x => x.id.toString() === value);
+    this.currentEndpoint = this.endpoints.find((x) => x.id.toString() === value);
     this.lottoService.notifyEndpointChange(this.currentEndpoint);
   }
 }

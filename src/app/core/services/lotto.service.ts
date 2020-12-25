@@ -1,47 +1,37 @@
-import { Injectable } from "@angular/core";
-import { Observable, of, pipe, Subject } from "rxjs";
-import {
-  HttpHeaders,
-  HttpClient,
-  HttpErrorResponse,
-} from "@angular/common/http";
-import { map, catchError } from "rxjs/operators";
-import { ApiResult } from "src/app/shared/models/api-result";
-import { ServiceEndpoint } from "src/app/shared/models/service-endpoint";
-import { UserConfigurationService } from "./user-configuration.service";
-import { LottoNumber } from "src/app/shared/models/lotto-number";
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { Observable, Subject } from 'rxjs';
+import { ApiResult } from 'src/app/shared/models/api-result';
+import { LottoNumber } from 'src/app/shared/models/lotto-number';
+import { ServiceEndpoint } from 'src/app/shared/models/service-endpoint';
+import { UserConfigurationService } from './user-configuration.service';
 
-@Injectable({
-  providedIn: "root",
-})
+@Injectable({ providedIn: 'root' })
 export class LottoService {
   private endpointHandler: Subject<ServiceEndpoint>;
   private currentEndpoint: ServiceEndpoint;
   private endpoints: ServiceEndpoint[] = [
     new ServiceEndpoint({
       id: 1,
-      description: "Sorteo de Navidad",
-      url: "/ws/LoteriaNavidadPremiados",
+      description: 'Sorteo de Navidad',
+      url: '/ws/LoteriaNavidadPremiados',
     }),
     new ServiceEndpoint({
       id: 2,
-      description: "Sorteo del Niño",
-      url: "/ws/LoteriaNinoPremiados",
+      description: 'Sorteo del Niño',
+      url: '/ws/LoteriaNinoPremiados',
     }),
   ];
 
-  constructor(
-    private http: HttpClient,
-    private userConfigService: UserConfigurationService
-  ) {
+  constructor(private http: HttpClient, private userConfigService: UserConfigurationService) {
     const configuration = this.userConfigService.getUserConfiguration();
     const endpointIndex = configuration.endpoint;
     this.currentEndpoint = this.endpoints.find((x) => x.id === endpointIndex);
     this.endpointHandler = new Subject<ServiceEndpoint>();
   }
 
-  public getEndpoints(): Observable<ServiceEndpoint[]> {
-    return of(this.endpoints);
+  public getEndpoints(): ServiceEndpoint[] {
+    return this.endpoints;
   }
 
   public getCurrentEndpoint(): ServiceEndpoint {
@@ -66,7 +56,7 @@ export class LottoService {
     try {
       await this.http.get(`${url}?n=${numero}`).toPromise();
     } catch (error) {
-      response = error.error.text.replace("busqueda=", "");
+      response = error.error.text.replace('busqueda=', '');
     }
     return JSON.parse(response);
   }

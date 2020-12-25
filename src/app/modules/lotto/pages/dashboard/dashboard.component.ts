@@ -1,19 +1,16 @@
-import { Component, OnInit } from "@angular/core";
-import { LottoNumber } from "src/app/shared/models/lotto-number";
-import { LottoService } from "src/app/core/services/lotto.service";
-import { forkJoin, Observable, of, from } from "rxjs";
-import { finalize, max } from "rxjs/operators";
-import { ServiceEndpoint } from "src/app/shared/models/service-endpoint";
+import { Component, OnInit } from '@angular/core';
+import { LottoNumber } from 'src/app/shared/models/lotto-number';
+import { LottoService } from 'src/app/core/services/lotto.service';
+import { from, forkJoin } from 'rxjs';
 
 @Component({
-  selector: "app-dashboard",
-  templateUrl: "./dashboard.component.html",
-  styleUrls: ["./dashboard.component.css"],
+  selector: 'app-dashboard',
+  templateUrl: './dashboard.component.html',
+  styleUrls: ['./dashboard.component.css'],
 })
 export class DashboardComponent implements OnInit {
   private reloadSeconds = 60;
   private interval: any;
-  private endpointHandler: Observable<ServiceEndpoint>;
   // tslint:disable-next-line: variable-name
   private _selectedNumber: LottoNumber = null;
 
@@ -33,8 +30,7 @@ export class DashboardComponent implements OnInit {
   }
 
   constructor(private lottoService: LottoService) {
-    this.endpointHandler = lottoService.getEndpointHandler();
-    this.endpointHandler.subscribe((_) => this.loadNumbers());
+    lottoService.getEndpointHandler().subscribe((_) => this.loadNumbers());
   }
 
   ngOnInit(): void {
@@ -43,7 +39,7 @@ export class DashboardComponent implements OnInit {
   }
 
   public openNewDialog() {
-    this.newItem = new LottoNumber({ amount: 20, number: 0, description: "" });
+    this.newItem = new LottoNumber({ amount: 20, number: 0, description: '' });
     this.showAddModal = true;
   }
 
@@ -72,39 +68,26 @@ export class DashboardComponent implements OnInit {
     this.lottoService.saveUserNumbers(this.numbers);
   }
 
-  public checkNumbers(): void {
+  public async checkNumbers(): Promise<void> {
     if (this.isBusy) {
       return;
     }
 
     this.isBusy = true;
 
-    const tasks = this.numbers.map((ticket) => {
-      return from(this.lottoService.checkNumber(ticket.number));
+    const result = await Promise.all(this.numbers.map((x) => this.lottoService.checkNumber(x.number)));
+    result.forEach((x) => {
+      const ticket = this.numbers.find((n) => n.number === x.numero);
+      ticket.price = x.premio > 0 ? (x.premio * ticket.amount) / 20 : null;
+      ticket.status = x.status;
     });
 
-    forkJoin(tasks)
-      .pipe(finalize(() => (this.isBusy = false)))
-      .subscribe((result) => {
-        result.forEach((x) => {
-          this.numbers
-            .filter((n) => n.number === x.numero)
-            .forEach((ticket) => {
-              ticket.price =
-                x.premio > 0 ? (x.premio * ticket.amount) / 20 : null;
-              ticket.status = x.status;
-            });
-        });
-
-        this.lottoService.saveUserNumbers(this.numbers);
-      });
+    this.lottoService.saveUserNumbers(this.numbers);
+    this.isBusy = false;
   }
 
   private startTimer() {
-    this.interval = setInterval(
-      () => this.checkNumbers(),
-      this.reloadSeconds * 1000
-    );
+    this.interval = setInterval(() => this.checkNumbers(), this.reloadSeconds * 1000);
   }
 
   private loadNumbers() {
