@@ -54,12 +54,11 @@ export class LottoService {
     let response: string;
 
     try {
-      const apiResponse = await this.http.get<string>(`${url}?n=${numero}`).toPromise();
-      response = apiResponse;
+      await this.http.get(`${url}?n=${numero}`).toPromise();
     } catch (error) {
-      response = error.error.text;
+      response = error.error.text.replace('busqueda=', '');
     }
-    return JSON.parse(response.replace('busqueda=', ''));
+    return JSON.parse(response);
   }
 
   public saveUserNumbers(numbers: LottoNumber[]): void {
